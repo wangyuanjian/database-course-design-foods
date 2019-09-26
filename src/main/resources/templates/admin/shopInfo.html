@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ShopInfo</title>
+    <!--JQuery文件务必在Bootstrap之前引入-->
+    <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <style type="text/css">
+        body{
+            margin-top: 70px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-fixed-top navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/admin/toIndex}">商店信息</a>
+        </div>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" th:text="${session.loginUser}"></a>
+                <ul class="dropdown-menu">
+                    <li><a th:href="@{'/admin/logout/' + ${session.loginUser}}">退出</a></li>
+                    <li th:if="${session.loginUser} ne 'admin'"><a th:href="@{'/record/getByCustomerName/' + ${session.loginUser}}">历史订单</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div><!-- /.nav-collapse -->
+    </div><!-- /.container -->
+</nav><!-- /.navbar -->
+<div class="panel" th:bgcolor="orange">
+    <div class="panel-body">
+        <form method="post" th:action="@{/shop/updateShopInfo}">
+            <h2 class="col-md-4 col-md-offset-4">修改餐饮点信息</h2>
+            <!--错误信息显示-->
+            <!--<div class="form-group col-md-4 col-md-offset-4" th:if="${not #strings.isEmpty(errorMsg)}">
+                <div class="alert alert-danger" th:text="${errorMsg}"></div>
+            </div>-->
+            <!--
+                如果想要设置表单不可编辑， 如果使用disabled属性，那么表单传到后台的值就会为null，
+                                        如果使用readonly属性，传到后台的值还会保存
+            -->
+            <div class="form-group col-md-4 col-md-offset-4">
+                <label for="id">ShopId</label>
+                <input type="text" id="id" name="id" readonly="readonly" class="form-control" required="true" th:value="${shopInfo.id}">
+            </div>
+
+            <div class="form-group col-md-4 col-md-offset-4">
+                <label for="shopName">shopName</label>
+                <input type="text" id="shopName" name="shopName" readonly="readonly" class="form-control" required="true" th:value="${shopInfo.shopName}">
+            </div>
+
+            <div class="form-group col-md-4 col-md-offset-4">
+                <label for="shopNumber">shopNumber</label>
+                <input type="text" id="shopNumber" name="shopNumber" class="form-control" required="true" th:value="${shopInfo.shopNumber}">
+            </div>
+
+
+            <!--<div class="form-group col-md-4 col-md-offset-4">
+                <label for="goods">Goods</label>
+                <input type="text" id="goods" name="goods" disabled="disabled" class="form-control" required="true" th:value="${shopInfo.goods}">
+            </div>-->
+            <div class="col-md-4 col-md-offset-4">
+                <table class="table table-striped" th:if="${shopInfo.goods != null}">
+                    <thead>
+                        <tr>
+                            <th>食品号</th>
+                            <th>食品名称</th>
+                            <th>食品种类</th>
+                            <th>单价</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="item:${shopInfo.goods}">
+                            <td th:text="${item.id}"></td>
+                            <td th:text="${item.foodName}"></td>
+                            <td th:text="${item.categoryName}"></td>
+                            <td th:text="${item.money}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-group  col-md-4 col-md-offset-4">
+                <button type="sumbit" class="btn btn-primary btn-block btn-lg">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

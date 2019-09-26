@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hfut.edu.databasecoursedesignfoods.mapper.FoodMapper">
+
+    <resultMap id="foodMap" type="com.hfut.edu.databasecoursedesignfoods.domain.Food">
+        <id column="id" property="id"/>
+        <result column="food_name" property="foodName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="money" property="money"/>
+        <result column="category_name" property="categoryName"/>
+    </resultMap>
+
+    <sql id="baseColumns">
+        id, food_name, category_id, money
+    </sql>
+
+    <!--to do-->
+    <!--public Food getById(Integer id);-->
+    <select id="getById" resultMap="foodMap">
+        select f.id, food_name, category_id, c.category_name, money
+        from tbl_food f, tbl_category c
+        where f.id=#{id} and f.category_id=c.id;
+    </select>
+
+    <!--public Food getByName(String name);-->
+    <select id="getByName" resultMap="foodMap">
+        select f.id, food_name, category_id, c.category_name, money
+        from tbl_food f, tbl_category c
+        where f.food_name=#{name} and f.category_id=c.id;
+    </select>
+
+    <!--public List<Food> getByIds(Integer[] ids);-->
+    <select id="getByIds" resultMap="foodMap">
+        select f.id, food_name, category_id, c.category_name, money
+        from tbl_food f, tbl_category c
+        where f.category_id=c.id and f.id in
+        <foreach collection="array" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--public Food updateById(Integer id);-->
+    <update id="updateById" parameterType="com.hfut.edu.databasecoursedesignfoods.domain.Food">
+        update tbl_food
+        <set>
+            <if test="foodName != null">
+                food_name = #{foodName},
+            </if>
+            <if test="money != null">
+                money = #{money}
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+    
+    <!--public List<String> getAllFoodNames();-->
+    <select id="getAllFoodNames" resultType="java.lang.String">
+        select food_name from tbl_food;
+    </select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

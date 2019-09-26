@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>siloam</title>
+    <!--JQuery文件务必在Bootstrap之前引入-->
+    <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <style type="text/css">
+        body{
+            margin-top: 70px;
+        }
+    </style>
+</head>
+</head>
+
+<body>
+<nav class="navbar navbar-fixed-top navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/admin/toIndex}">历史订单</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" th:text="${session.loginUser}"></a>
+                <ul class="dropdown-menu">
+                    <li><a th:href="@{'/admin/logout/' + ${session.loginUser}}">退出</a></li>
+                    <li th:if="${session.loginUser} ne 'admin'"><a th:href="@{'/record/getByCustomerName/' + ${session.loginUser}}">历史订单</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div><!-- /.container -->
+</nav><!-- /.navbar -->
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped" th:if="${records != null}">
+                <thead>
+                    <tr>
+                        <th>消费流水号</th>
+                        <th>商店</th>
+                        <th>消费时间</th>
+                        <th>消费金额</th>
+                        <th th:if="${session.loginUser} ne 'admin' ">去留言</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="item:${records}">
+                        <td th:text="${item.id}"></td>
+                        <td th:text="${item.shopName}"></td>
+                        <td th:text="${item.time}"></td>
+                        <td th:text="${item.money}"></td>
+                        <td th:if="${session.loginUser} ne 'admin' ">
+                            <a class="btn btn-sm btn-success" th:if="${session.loginUser} ne 'admin'" th:href="@{/record/toLeaveMessagePage/{idd}(idd=${item.id})}">留言</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+<!--
+            <a th:if="${session.loginUser} eq 'admin' " class="btn btn-sm btn-warning pull-right" onclick="calIncome()">计算历史收益</a>
+-->
+        </div>
+    </div><!--<div class="row">-->
+</div><!--/.container-->
+</body>
+</html>

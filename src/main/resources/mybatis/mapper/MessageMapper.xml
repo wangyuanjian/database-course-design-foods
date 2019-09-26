@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hfut.edu.databasecoursedesignfoods.mapper.MessageMapper">
+    
+    <resultMap id="messageMap" type="com.hfut.edu.databasecoursedesignfoods.domain.Message">
+        <id column="id" property="id"/>
+        <result column="customer_id" property="customerId" />
+        <result column="shop_id" property="shopId" />
+        <result column="record_id" property="recordId" />
+        <result column="time" property="time" />
+        <result column="content" property="content" />
+        <result column="customer_read" property="customerRead" />
+        <result column="shop_read" property="shopRead" />
+    </resultMap>
+    
+    <sql id="baseColumns">
+        id, customer_id, shop_id, record_id, `time`, content, customer_read, shop_read
+    </sql>
+
+    <!--    public boolean insertMessage(Message message);-->
+    <insert id="insertMessage" parameterType="com.hfut.edu.databasecoursedesignfoods.domain.Message"
+    useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_message(customer_id, shop_id, record_id, `time`, content, customer_read, shop_read)
+        values
+        (#{customerId}, #{shopId}, #{recordId}, #{time}, #{content}, #{customerRead}, #{shopRead})
+    </insert>
+</mapper>

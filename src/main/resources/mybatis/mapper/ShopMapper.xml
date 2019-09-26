@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hfut.edu.databasecoursedesignfoods.mapper.ShopMapper">
+
+    <resultMap id="shopMap" type="com.hfut.edu.databasecoursedesignfoods.domain.ShopSimple">
+        <id column="id" property="id"/>
+        <result column="shop_name" property="shopName" />
+        <result column="shop_number" property="shopNumber" />
+        <result column="area_id" property="areaId" />
+        <result column="goods" property="goods" />
+        <result column="area_name" property="areaName" />
+    </resultMap>
+    
+    <parameterMap id="pm" type="java.util.Map">
+        <parameter property="id" jdbcType="INTEGER" mode="IN"/>
+        <parameter property="money" jdbcType="DOUBLE" mode="OUT"/>
+    </parameterMap>
+
+    <sql id="baseColumns">
+        id, shop_name, shop_number, area_id, goods
+    </sql>
+    
+    <!--public ShopSimple getById(Integer id);-->
+    <select id="getById" resultMap="shopMap">
+        select s.id, shop_name, shop_number, area_id, goods, a.area_name
+        from tbl_shop s, tbl_area a
+        where s.id=#{id} and s.area_Id=a.id;
+    </select>
+
+    <!--    public List<ShopSimple> getShops();-->
+    <select id="getShops" resultMap="shopMap">
+        select s.id, shop_name, shop_number, area_id, goods, a.area_name
+        from tbl_shop s, tbl_area a
+        where s.area_Id=a.id;
+    </select>
+    
+    <!--public List<ShopSimple> getByAreaId(Integer id);-->
+    <select id="getByAreaId" resultMap="shopMap">
+        select s.id, shop_name, shop_number, area_id, goods, a.area_name
+        from tbl_shop s, tbl_area a
+        where s.area_id=#{id} and s.area_Id=a.id;
+    </select>
+
+    <!--public boolean updateShopInfo(ShopSimple simple);-->
+    <update id="updateShopInfo" parameterType="com.hfut.edu.databasecoursedesignfoods.domain.ShopSimple">
+        update tbl_shop set shop_number=#{shopNumber} where id=#{id};
+    </update>
+
+    <!--public Double calHistoryIncome(Integer id);-->
+    <select id="calHistoryIncome" resultType="java.lang.Double">
+        select sum(money) from tbl_records where shop_id=#{id}
+    </select>
+
+    <!--public Double calHistoryIncomeByProcedure(Income income);-->
+    <!--public void calHistoryIncomeByProcedure(Map<String, Object> map);-->
+    <select id="calHistoryIncomeByProcedure" statementType="CALLABLE" parameterType="java.util.Map">
+            {call proc_totolIncomeByShopId(
+                #{id, mode=IN, jdbcType=INTEGER},
+                #{money, mode=OUT, jdbcType=DOUBLE}
+            )}
+    </select>
+    
+    <!--public boolean public boolean addOneFood(FoodUpdate update);;-->
+    <update id="addOneFood">
+        update tbl_shop set goods=#{goods} where id=#{shopId}
+    </update>
+    
+    <!--public List<ShopSimple> getShopsByFoodId(String id);-->
+    <select id="getShopsByFoodId" resultMap="shopMap">
+        select s.id, shop_name, shop_number, area_id, goods, a.area_name
+        from tbl_shop s, tbl_area a
+        where s.area_Id=a.id and goods like concat('%', #{id}, '%')
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+

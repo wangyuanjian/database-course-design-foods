@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>siloam</title>
+    <!--JQuery文件务必在Bootstrap之前引入-->
+    <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <style type="text/css">
+        body{
+            margin-top: 70px;
+        }
+    </style>
+</head>
+</head>
+
+<body>
+<nav class="navbar navbar-fixed-top navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/admin/toIndex}">商店</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a th:href="@{#}">别点我</a> </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">选择地点 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a th:href="@{/shop/getByAreaId/1}">蜀山区大润发</a></li>
+                        <li><a th:href="@{/shop/getByAreaId/2}">经开区大学城</a></li>
+                        <li><a th:href="@{/shop/getByAreaId/3}">蜀山区华润五彩国际</a></li>
+                        <li><a th:href="@{/shop/getByAreaId/4}">瑶海区之心城</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">选择商店 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a th:href="@{/shop/getById/7}">美味无极限</a></li>
+                        <li><a th:href="@{/shop/getById/8}">来一碗</a></li>
+                        <li><a th:href="@{/shop/getById/9}">老乡鸡</a></li>
+                        <li><a th:href="@{/shop/getById/10}">蒸小皖</a></li>
+                        <li><a th:href="@{/shop/getById/11}">魔力快餐</a></li>
+                        <li><a th:href="@{/shop/getById/12}">广源快餐</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" th:text="${session.loginUser}"></a>
+                    <ul class="dropdown-menu">
+                        <li><a th:href="@{'/admin/logout/' + ${session.loginUser}}">退出</a></li>
+                        <li th:if="${session.loginUser} ne 'admin'"><a th:href="@{'/record/getByCustomerName/' + ${session.loginUser}}">历史订单</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.nav-collapse -->
+    </div><!-- /.container -->
+</nav><!-- /.navbar -->
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-offset-4 col-md-6" th:if="${session.loginUser} ne 'admin'">
+            <form method="post" th:action="@{/shop/getShopsByFoodName}" class="form-inline">
+                <!--<h2 class="col-md-4 col-md-offset-4">添加食品信息</h2>-->
+
+                <!--要在页面加载完成后显示出来-->
+                <!--col-md-4 col-md-offset-4-->
+                <div class="form-group ">
+                    <!--<label for="foodName">选择食品</label>-->
+                    <select id="foodName" name="foodName" class="form-control">
+                        <option>请选择你想要的食物吧</option>
+                    </select>
+                </div>
+
+                <!-- col-md-4 col-md-offset-4-->
+                <div class="form-group ">
+                    <button type="sumbit" class="btn btn-primary btn-block">查询</button>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="col-md-12">
+            <table class="table table-striped" th:if="${shop != null}">
+                <thead>
+                    <tr>
+                        <th>商店名</th>
+                        <th>联系方式</th>
+                        <th>所在地区</th>
+                        <th th:if="${session.loginUser} ne 'admin'">行动吧!</th>
+                        <th th:if="${session.loginUser} eq 'admin'">商品信息</th>
+                        <th th:if="${session.loginUser} eq 'admin'">看看收益</th>
+                        <th th:if="${session.loginUser} eq 'admin'">修改信息</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item:${shop}">
+                        <td th:text="${item.shopName}"></td>
+                        <td th:text="${item.shopNumber}"></td>
+                        <td th:text="${item.areaName}"></td>
+                        <td th:if="${session.loginUser} ne 'admin'"><a class="btn btn-sm btn-primary"  th:href="@{/shop/getFoodsByShop/{idd}(idd=${item.id})}">去点餐</a> </td>
+                        <td th:if="${session.loginUser} eq 'admin'"><a class="btn btn-sm btn-primary"  th:href="@{/shop/getFoodsByShop/{idd}(idd=${item.id})}">查看</a> </td>
+                        <td th:if="${session.loginUser} eq 'admin'"><a class="btn btn-sm btn-success"th:href="@{/record/getByShopId/{idd}(idd=${item.id})}">$收益$</a> </td>
+                        <td th:if="${session.loginUser} eq 'admin'"><a class="btn btn-sm btn-danger" th:href="@{/shop/toShopInfoPage/{idd}(idd=${item.id})}">修改</a> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div><!--<div class="row">-->
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped" th:if="${shops != null}">
+                <thead>
+                    <tr>
+                        <th>商店名</th>
+                        <th>联系方式</th>
+                        <th>所在地区</th>
+                        <th th:if="${session.loginUser} ne 'admin'">行动吧!</th>
+                        <th th:if="${session.loginUser} eq 'admin'">商品信息</th>
+                        <th th:if="${session.loginUser} eq 'admin'">看看收益</th>
+                        <th th:if="${session.loginUser} eq 'admin'">修改信息</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item:${shops}">
+                        <td th:text="${item.shopName}"></td>
+                        <td th:text="${item.shopNumber}"></td>
+                        <td th:text="${item.areaName}"></td>
+                        <td th:if="${session.loginUser} ne 'admin'"><a class="btn btn-sm btn-primary" th:href="@{/shop/getFoodsByShop/{idd}(idd=${item.id})}">去点餐</a> </td>
+                        <td th:if="${session.loginUser} eq 'admin'"><a class="btn btn-sm btn-primary"  th:href="@{/shop/getFoodsByShop/{idd}(idd=${item.id})}">查看</a> </td>
+                        <td th:if="${session.loginUser} eq 'admin'"><a class="btn btn-sm btn-success"  th:href="@{/record/getByShopId/{idd}(idd=${item.id})}">$收益$</a> </td>
+                        <td th:if="${session.loginUser} eq 'admin'"><a class="btn btn-sm btn-danger" th:href="@{/shop/toShopInfoPage/{idd}(idd=${item.id})}">修改</a> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div><!--<div class="row">-->
+</div><!--/.container-->
+<script>
+    $(document).ready(function(){
+        $.ajax({
+            type:"get",
+            dataType:"json",
+            url:"/food/getAllFoodNames",
+            success:function (nameList) {
+                var unitObj = document.getElementById("foodName");
+                if(nameList != null){
+                    for(var i = 0; i < nameList.length; i++){
+                        unitObj.options.add(new Option(nameList[i]));
+                    }
+                }
+            },
+            error:function(nameList){
+                var unitObj = document.getElementById("foodName");
+                if(nameList != null){
+                    for(var i = 0; i < nameList.length; i++){
+                        unitObj.options.add(new Option(nameList[i]));
+                    }
+                }
+            }
+        })
+    })
+</script>
+</body>
+</html>

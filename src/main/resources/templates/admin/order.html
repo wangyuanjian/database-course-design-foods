@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>siloam</title>
+    <!--JQuery文件务必在Bootstrap之前引入-->
+    <script src="/webjars/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <style type="text/css">
+        body{
+            margin-top: 70px;
+        }
+    </style>
+</head>
+</head>
+
+<body>
+<nav class="navbar navbar-fixed-top navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/admin/toIndex}">订单</a>
+        </div>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" th:text="${session.loginUser}"></a>
+                <ul class="dropdown-menu">
+                    <li><a th:href="@{'/admin/logout/' + ${session.loginUser}}">退出</a></li>
+                    <li th:if="${session.loginUser} ne 'admin'"><a th:href="@{'/record/getByCustomerName/' + ${session.loginUser}}">历史订单</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div><!-- /.nav-collapse -->
+    </div><!-- /.container -->
+</nav><!-- /.navbar -->
+
+<div class="container">
+    <a class="btn btn-md btn-primary pull-right" id="shopId" th:text="${thisShop}"></a>
+    <a class="btn btn-md btn-primary pull-right" th:text="${thisShopName}"></a>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped" th:if="${foods != null}">
+                <thead>
+                    <tr>
+                        <th>食品号</th>
+                        <th>食品名称</th>
+                        <th>食品种类</th>
+                        <!--<th>单价</th>-->
+                        <th><a  class="btn btn-sm btn-success" onclick="mySort()">单价</a> </th>
+                        <th th:if="${session.loginUser} ne 'admin'">行动吧!</th>
+                        <th th:if="${session.loginUser} eq 'admin'">修改</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody">
+                    <tr th:each="item:${foods}">
+                        <td th:text="${item.id}"></td>
+                        <td th:text="${item.foodName}"></td>
+                        <td th:text="${item.categoryName}"></td>
+                        <td th:text="${item.money}"></td>
+                        <!--<td><a class="btn btn-sm btn-primary" th:href="@{#}">去点餐</a> </td>-->
+                        <td th:if="${session.loginUser} ne 'admin'"><input type="checkbox" th:value="${item.id}" /></td>
+                        <td th:if="${session.loginUser} eq 'admin'"> <a class="btn btn-sm btn-danger" th:if="${session.loginUser} eq 'admin'" th:href="@{/food/toFoodInfoPage/{idd}(idd=${item.id})}">修改</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <a th:if="${session.loginUser} ne 'admin'" class="btn btn-sm btn-warning pull-right" onclick="commit()">提交选餐</a>
+            <a th:if="${session.loginUser} eq 'admin' " class="btn btn-sm btn-warning pull-right" th:href="@{'/shop/toAddOneFoodPage/' + ${thisShop} }">新增食品</a>
+        </div>
+    </div><!--<div class="row">-->
+</div><!--/.container-->
+<!---->
+
+<script type="text/javascript">
+    function commit() {
+        var selected = [];
+        var shopId = document.getElementById("shopId");
+        selected.push(shopId.text);
+        $(":checkbox:checked").each(function () {
+            selected.push(this.value);
+        });
+        $.ajax({
+            type:"POST",
+            contentType:"application/json;charset=UTF-8",
+            url:"/record/commit",
+            dataType:"text",
+            data:JSON.stringify(selected),
+            success:function(result){
+                confirm(result);
+            },
+            error:function (result) {
+                confirm(result);
+            }
+        });
+    }
+    /*点击按钮实现单价升序排列*/
+    function mySort() {
+        var tbody = document.querySelector("tbody");
+        var trs = document.querySelectorAll("tbody tr");
+        var len = trs.length;
+        var trArr = [];
+        var th;
+        // alert(tbody);
+        // alert(trs);
+        for(var i = 0; i < len; i++){
+            var tds = trs[i].querySelectorAll("td");
+            if(tds.length == 0){
+                th = trs[i];
+                continue;
+            }
+            //tds.item(3).innerText 就是我们需要的单价
+            // alert(tds.item(3).innerText);
+            trArr.push({id:tds[0].innerHTML,
+                        name:tds[1].innerText,
+                        category:tds[2].innerText,
+                        index:tds[3].innerHTML,
+                        button:tds[4]});
+        }
+
+        function compare(prop){
+            return function (a, b) {
+                var value1 = a[prop];
+                var value2 = b[prop];
+                return value1 - value2;
+            }
+        }
+
+        trArr.sort(compare('index'));
+
+        tbody.innerHTML = "";
+        // tbody.appendChild(th);
+        for(var i = 0; i < trArr.length; i++){
+            var tr = document.createElement("TR");
+
+            var tdId = document.createElement("TD");
+            tdId.innerText = trArr[i].id;
+            var tdName = document.createElement("TD");
+            tdName.innerText = trArr[i].name;
+            var tdCategory = document.createElement("TD");
+            tdCategory.innerText = trArr[i].category;
+            var tdIndex = document.createElement("TD");
+            tdIndex.innerText = trArr[i].index;
+            var tdButton = document.createElement("TD");
+            tdButton = trArr[i].button;
+
+            tr.appendChild(tdId);
+            tr.appendChild(tdName);
+            tr.appendChild(tdCategory);
+            tr.appendChild(tdIndex);
+            tr.appendChild(tdButton);
+            tbody.appendChild(tr);
+        }
+    }
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

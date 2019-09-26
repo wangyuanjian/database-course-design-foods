@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hfut.edu.databasecoursedesignfoods.mapper.CategoryMapper">
+
+    <resultMap id="categoryMap" type="com.hfut.edu.databasecoursedesignfoods.domain.Category">
+        <id column="id" property="id" />
+        <result column="category_name" property="categoryName"/>
+    </resultMap>
+
+    <sql id="baseColumns">
+        id, category_name
+    </sql>
+
+    <!--public List<Category> allCategories();-->
+    <select id="allCategories" resultMap="categoryMap">
+        select <include refid="baseColumns" /> from view_category;
+    </select>
+</mapper>
