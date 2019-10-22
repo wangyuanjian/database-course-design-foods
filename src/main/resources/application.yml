@@ -14,7 +14,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver   # mysql驱动包
     url: jdbc:mysql://localhost:3306/foods
     username: root
-    password: 876348845
+    password: *your password here*
     dbcp2:
       min-idle: 5             # 最小维持连接数
       initial-size: 5         # 初始化连接数
